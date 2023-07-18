@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>서울 시청</title>
+  <link rel="icon" href="../favicon.ico">
+  <link rel="stylesheet" href="css/style.css"/>
+  <script src="js/jquery-1.7.1.min.js"></script>
+  <script src = "js/script2.js"></script>
+</head>
+<body>
+<header>
+  <div id="header">
+    <div id="header_menu">
+      <h1 class="logo">
+        <a href="../index.html"><span>서울시청</span></a>
+      </h1>
+      <nav class="gnb">
+        <ul class = "menu">
+          <li class = "first"><a href="../index.html">서울소식</a></li>
+          <li><a href="../sub2/board.html">시민참여</a></li>
+          <li><a href="../sub3/q&a.html">분야별정보</a></li>
+          <li><a href="../sub2/board.html">서울소개</a></li>
+          <li><a href="../sub3/q&a.html">부서안내</a></li>
+          <li><a href="../sub2/board.html">정보공개</a></li>
+          <li class ="last"><a href="../sub3/q&a.html">응답소</a></li>
+
+        </ul>
+        <ul class = "others">
+          <li><a href="../sub1/login.html">로그인</a></li>
+          <li><a href="../sub1/login.html">나의 서울</a></li>
+          <li><a href="../sub1/login.html">전자우편</a></li>
+        </ul>
+      </nav>
+    </div>
+    <div id="header_search">
+      <div class="header_search2">
+        <div class="h_logo">
+          <h2><span>동해서울매력</span></h2>
+        </div>
+        <div class="h_serach">
+          <input type="text" id ="search_text" class = "guide_text" name= "search_text" value="검색어를 입력해주세요"/>
+          <img src="images/keyboard.png" alt="키보드이미지"/>
+          <button type="button" id ="button_image" class="button_image"><span>검색</span></button>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+<section>
+  <div class="sec">
+    <h1>문제 풀이 애플리케이션</h1>
+    <h3 th:text="${title}">제목</h3>
+    <!--/* 등록/변경 완료 메시지 */-->
+    <p th:if="${complete}" th:text="${complete}" style="color:blue"></p>
+    <!--등록과 변경 처리를 분리-->
+    <form method="POST" th:action="${testForm.newTest} ? @{/test/insert} : @{/test/update}" th:object="${testForm}">
+      <!--th:field 속성에 '*{필드명}'을 지정-->
+      <label>퀴즈 내용: </label><br>
+      <textarea rows="5" cols="50" th:field="*{question}"></textarea>
+      <br>
+      <div th:if="${#fields.hasErrors('question')}" th:errors="*{question}"
+           style="color:red"></div>
+      <label>퀴즈 정답: </label><br>
+      <input type="radio" value="true" th:field="*{answer}" > O
+      <input type="radio" value="false" th:field="*{answer}" > X
+      <br>
+      <div th:if="${#fields.hasErrors('answer')}" th:errors="*{answer}"
+           style="color:red"></div>
+      <label>작성자: </label><br>
+      <input type="text" th:field="*{author}" />
+      <br>
+      <div th:if="${#fields.hasErrors('author')}" th:errors="*{author}"
+           style="color:red"></div>
+      <input th:if="${id}" type="hidden" th:field="*{id}" >
+      <input type="submit" value="저장">
+    </form>
+    <br>
+    <!--여기까지가 상단 영역 부분-->
+
+    <hr><!--신규등록인 경우만 보임-->
+    <div th:if="${testForm.newTest}" style="margin: 10px">
+      <h3>등록된 퀴즈 목록 <a th:href="@{/test/play}">플레이</a><br></h3>
+      <!--/* 삭제 완료 메시지 */-->
+      <p th:if="${delcomplete}" th:text="${delcomplete}" style="color:blue"></p>
+      <p th:if="${msg}" th:text="${msg}" style="color:red"></p>
+      <!--퀴즈 정보가 있으면 보임-->
+      <table border="1" th:unless="${#lists.isEmpty(list)}"
+             style="table-layout: fixed;">
+        <tr>
+          <th>ID</th>
+          <th>내용</th>
+          <th>해답</th>
+          <th>작성자</th>
+          <th>변경</th>
+          <th>삭제</th>
+        </tr>
+        <tr th:each="obj : ${list}" align="center">
+          <td th:text="${obj.id}"></td>
+          <td th:text="${obj.question}" align="left"></td>
+          <td th:text="${obj.answer} == true?'O':'X'"></td>
+          <td th:text="${obj.author}"></td>
+          <!--/* 변경 버튼 */-->
+          <td>
+            <form method="GET" th:action="@{/test/{id}(id=${obj.id})}">
+              <input type="submit" value="변경">
+            </form>
+          </td>
+          <!--/* 삭제 버튼 */-->
+          <td>
+            <form method="POST" th:action="@{/test/delete}">
+              <input type="hidden" name="id" th:value="${obj.id}">
+              <input type="submit" value="삭제">
+            </form>
+          </td>
+        </tr>
+      </table>
+      <!--퀴즈 정보가 있으면 보임-->
+      <p th:if="${#lists.isEmpty(list)}">등록된 퀴즈가 없습니다.</p>
+    </div><!--신규등록인 경우만 보임-->
+
+    <p th:unless="${testForm.newTest}">
+      <a href="#" th:href="@{/test}">CRUD 화면에 돌아가기</a>
+    </p>
+
+  </div>
+
+</section>
+
+<footer>
+  <div id="footer">
+    <div class="foot_menu">
+      <div class="foot_u">
+        <ul>
+          <li><a href="#">누리집 도우미</a></li>
+          <li class = "policy"><a href="#">개인정보처리방침</a></li>
+          <li><a href="#">저작권 정책</a></li>
+          <li><a href="#">영상정보처리기기 운영 처리 방침</a></li>
+          <li><a href="#">누리집 바로잡기</a></li>
+          <li><a href="#">누리집지도</a></li>
+        </ul>
+      </div>
+      <div class="sns_img">
+        <a href="#" class ="fb" title ="페이스북">페이스북</a>
+        <a href="#"  class ="tw" title ="트위터">트위터</a>
+        <a href="#"  class ="ins" title ="인스타그램">인스타그램</a>
+        <a href="#"  class ="ks" title ="카카오스토리">카카오스토리</a>
+        <a href="#"  class ="yt" title ="유튜브">유튜브</a>
+        <a href="#"  class ="bl" title ="블로그">블로그</a>
+      </div>
+    </div>
+    <div class="foot_end">
+      <span class="question"></span>
+      <div class="address">
+        <p class="city">
+          서울특별시청 04524 서울특별시 중구 세종대로 11
+          <a href="#">[찾아오시는 길]</a>
+        </p>
+        <p>대표전화: 02-120 또는 02-731-2120  로그인 문의 : 02-2126-4519 / 02-2133-6517</p>
+        <p class="copy">
+          © Seoul Metropolitan Government all rights reserved
+        </p>
+      </div>
+      <div class="foot_view">
+        <a href="#"><img src="images/footer_mark_isms-p.png" width="100" alt="aa"/></a>
+        <a href="#"><img src="images/footer_mark_wah.png" width="120" alt="aa"/></a>
+      </div>
+    </div>
+  </div>
+</footer>
+</body>
+</html>
